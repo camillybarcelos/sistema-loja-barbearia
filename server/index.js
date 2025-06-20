@@ -19,7 +19,24 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'sua-chave-secreta-aqui';
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  'https://sistema-loja-barbearia-frontend.vercel.app', // URL do seu frontend
+  'http://localhost:5173', // Para desenvolvimento local
+  'http://localhost:3000'  // Outra porta comum de desenvolvimento
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permite requisições sem 'origin' (ex: apps mobile, Postman) ou da lista de permitidos
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
