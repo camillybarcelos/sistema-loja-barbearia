@@ -54,7 +54,7 @@ export default function Header() {
               <button className="flex items-center space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
                   <span className="text-blue-600 dark:text-blue-300 font-medium text-sm">
-                    {user?.name.charAt(0).toUpperCase()}
+                    {user?.name ? user.name.charAt(0).toUpperCase() : ''}
                   </span>
                 </div>
                 <span className="hidden md:block text-sm font-medium text-gray-900 dark:text-white">

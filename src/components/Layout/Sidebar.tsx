@@ -98,7 +98,7 @@ export default function Sidebar() {
           <div className="flex items-center">
             <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
               <span className="text-blue-600 dark:text-blue-300 font-medium">
-                {user?.name.charAt(0).toUpperCase()}
+                {user?.name ? user.name.charAt(0).toUpperCase() : ''}
               </span>
             </div>
             <div className="ml-3">
