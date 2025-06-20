@@ -108,7 +108,6 @@ const mockServices: Service[] = [
     name: 'Corte Masculino',
     price: 25.00,
     duration: 30,
-    commission: 40,
     category: 'haircut',
     description: 'Corte de cabelo masculino tradicional',
     createdAt: new Date(),
@@ -118,7 +117,6 @@ const mockServices: Service[] = [
     name: 'Barba',
     price: 15.00,
     duration: 20,
-    commission: 40,
     category: 'beard',
     description: 'Fazer a barba',
     createdAt: new Date(),
@@ -128,7 +126,6 @@ const mockServices: Service[] = [
     name: 'Corte + Barba',
     price: 35.00,
     duration: 45,
-    commission: 40,
     category: 'combo',
     description: 'Corte de cabelo + fazer a barba',
     createdAt: new Date(),
@@ -138,7 +135,6 @@ const mockServices: Service[] = [
     name: 'Hidratação',
     price: 20.00,
     duration: 25,
-    commission: 40,
     category: 'other',
     description: 'Hidratação capilar',
     createdAt: new Date(),
@@ -152,7 +148,7 @@ const mockBarbers: Barber[] = [
     email: 'joao@barbearia.com',
     phone: '(11) 99999-9999',
     commissionRate: 40,
-    specialties: ['Corte Masculino', 'Barba'],
+    specialties: 'Corte Masculino, Barba',
     isActive: true,
     createdAt: new Date(),
   },
@@ -162,7 +158,7 @@ const mockBarbers: Barber[] = [
     email: 'miguel@barbearia.com',
     phone: '(11) 88888-8888',
     commissionRate: 35,
-    specialties: ['Corte Masculino', 'Hidratação'],
+    specialties: 'Corte Masculino, Hidratação',
     isActive: true,
     createdAt: new Date(),
   }
@@ -446,41 +442,47 @@ export function AppProvider({ children }: AppProviderProps) {
   };
 
   const addSale = (sale: Omit<Sale, 'id' | 'createdAt'>) => {
-    const newSale: Sale = {
+    const newSale = {
       ...sale,
-      id: Date.now().toString(),
-      createdAt: new Date(),
+      id: `sale-${Date.now()}`,
+      createdAt: new Date()
     };
     setSales(prev => [...prev, newSale]);
-    
-    // Atualizar totalPurchases do cliente se a venda não for no fiado
-    if (sale.customerId && sale.paymentMethod !== 'credit') {
-      setCustomers(prev => prev.map(customer => {
-        if (customer.id === sale.customerId) {
-          return {
-            ...customer,
-            totalPurchases: customer.totalPurchases + sale.total,
-            lastVisit: new Date()
+
+    // Lógica para gerar comissão (exemplo)
+    const newCommissions: Commission[] = [];
+    sale.items.forEach(item => {
+      if (item.type === 'service' && item.barberId && item.serviceId) {
+        const service = services.find(s => s.id === item.serviceId);
+        const barber = barbers.find(b => b.id === item.barberId);
+
+        if (service && barber) {
+          const commissionAmount = service.price * (barber.commissionRate / 100);
+          const newCommission: Commission = {
+            id: `comm-${Date.now()}-${item.serviceId}`,
+            barberId: item.barberId,
+            saleId: newSale.id,
+            serviceId: item.serviceId,
+            amount: commissionAmount,
+            percentage: barber.commissionRate,
+            status: 'pending',
+            period: new Date().toISOString().slice(0, 7), // Formato YYYY-MM
+            createdAt: new Date(),
           };
+          newCommissions.push(newCommission);
         }
-        return customer;
-      }));
-    } else if (sale.customerId) {
-      // Para vendas no fiado, apenas atualizar lastVisit
-      setCustomers(prev => prev.map(customer => {
-        if (customer.id === sale.customerId) {
-          return {
-            ...customer,
-            lastVisit: new Date()
-          };
-        }
-        return customer;
-      }));
+      }
+    });
+
+    // Adiciona as novas comissões ao estado (se houver um estado de comissões)
+    if (newCommissions.length > 0) {
+      console.log('Comissões geradas:', newCommissions);
+      // setCommissions(prev => [...prev, ...newCommissions]);
     }
   };
 
   const addAppointment = (appointment: Omit<Appointment, 'id' | 'createdAt'>) => {
-    console.log('=== DEBUG: Criando agendamento ===');
+    console.log('=== DEBUG: Adicionando novo agendamento ===');
     console.log('Dados recebidos:', appointment);
     
     const newAppointment: Appointment = {

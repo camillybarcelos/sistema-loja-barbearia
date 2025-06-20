@@ -35,7 +35,6 @@ const serviceSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   duration: { type: Number, required: true },
-  commission: { type: Number, required: true },
   category: { type: String, required: true },
   description: String
 }, { timestamps: true });

@@ -89,7 +89,6 @@ export interface Service {
   name: string;
   price: number;
   duration: number; // in minutes
-  commission: number; // percentage
   category: 'haircut' | 'beard' | 'combo' | 'other';
   description?: string;
   createdAt: Date;
@@ -101,7 +100,7 @@ export interface Barber {
   email: string;
   phone: string;
   commissionRate: number; // percentage
-  specialties: string[];
+  specialties: string;
   avatar?: string;
   isActive: boolean;
   createdAt: Date;

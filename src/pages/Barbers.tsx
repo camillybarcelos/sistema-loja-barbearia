@@ -187,18 +187,15 @@ export default function Barbers() {
                 </span>
               </div>
               
-              {barber.specialties.length > 0 && (
+              {barber.specialties && (
                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Especialidades:</p>
                   <div className="flex flex-wrap gap-1">
-                    {barber.specialties.map((specialty, index) => (
                       <span
-                        key={index}
                         className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 rounded-full"
                       >
-                        {specialty}
+                        {barber.specialties}
                       </span>
-                    ))}
                   </div>
                 </div>
               )}
@@ -237,31 +234,23 @@ function BarberModal({
     email: barber?.email || '',
     phone: barber?.phone || '',
     commissionRate: barber?.commissionRate || 40,
-    specialties: barber?.specialties || [],
+    specialties: barber?.specialties || '',
     isActive: barber?.isActive ?? true
   });
 
-  const [newSpecialty, setNewSpecialty] = useState('');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
-  };
-
-  const addSpecialty = () => {
-    if (newSpecialty.trim() && !formData.specialties.includes(newSpecialty.trim())) {
-      setFormData({
-        ...formData,
-        specialties: [...formData.specialties, newSpecialty.trim()]
-      });
-      setNewSpecialty('');
-    }
-  };
-
-  const removeSpecialty = (specialty: string) => {
-    setFormData({
+    onSave({
       ...formData,
-      specialties: formData.specialties.filter(s => s !== specialty)
+      commissionRate: Number(formData.commissionRate),
     });
   };
 
@@ -281,102 +270,85 @@ function BarberModal({
               type="text"
               required
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              onChange={handleChange}
+              name="name"
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Telefone
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Telefone
-            </label>
-            <input
-              type="tel"
-              required
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Taxa de Comissão (%)
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              required
-              value={formData.commissionRate}
-              onChange={(e) => setFormData({...formData, commissionRate: parseInt(e.target.value)})}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Especialidades
-            </label>
-            <div className="flex space-x-2 mb-2">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="commissionRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Comissão (%)
+              </label>
+              <input
+                type="number"
+                id="commissionRate"
+                name="commissionRate"
+                value={formData.commissionRate}
+                onChange={handleChange}
+                min="0"
+                max="100"
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="specialties" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Especialidades (separadas por vírgula)
+              </label>
               <input
                 type="text"
-                value={newSpecialty}
-                onChange={(e) => setNewSpecialty(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialty())}
-                placeholder="Digite uma especialidade"
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                id="specialties"
+                name="specialties"
+                value={formData.specialties}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <button
-                type="button"
-                onClick={addSpecialty}
-                className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.specialties.map((specialty, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 rounded-full"
-                >
-                  {specialty}
-                  <button
-                    type="button"
-                    onClick={() => removeSpecialty(specialty)}
-                    className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
             </div>
           </div>
-          
+
           <div className="flex items-center">
             <input
-              type="checkbox"
               id="isActive"
+              name="isActive"
+              type="checkbox"
               checked={formData.isActive}
-              onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              onChange={handleChange}
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900 dark:text-white">
-              Barbeiro ativo
+            <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+              Barbeiro Ativo
             </label>
           </div>
           

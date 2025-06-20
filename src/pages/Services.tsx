@@ -92,17 +92,6 @@ export default function Services() {
             </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center">
-            <Percent className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Comissão Média</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {services.length > 0 ? Math.round(services.reduce((sum, s) => sum + s.commission, 0) / services.length) : 0}%
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Filters */}
@@ -194,21 +183,6 @@ export default function Services() {
                   {service.duration} min
                 </span>
               </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Comissão:</span>
-                <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                  {service.commission}%
-                </span>
-              </div>
-              
-              {service.description && (
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {service.description}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         ))}
@@ -243,89 +217,92 @@ function ServiceModal({
     name: service?.name || '',
     price: service?.price || 0,
     duration: service?.duration || 30,
-    commission: service?.commission || 40,
     category: service?.category || 'haircut',
     description: service?.description || ''
   });
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    const isNumber = e.target.type === 'number';
+    setFormData({ ...formData, [name]: isNumber ? parseFloat(value) || 0 : value });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          {service ? 'Editar Serviço' : 'Novo Serviço'}
-        </h3>
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-0 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            {service ? 'Editar Serviço' : 'Novo Serviço'}
+          </h3>
+        </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Nome do Serviço
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Preço (R$)
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Nome do Serviço
               </label>
               <input
-                type="number"
-                step="0.01"
+                type="text"
+                id="name"
+                name="name"
                 required
-                value={formData.price}
-                onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})}
+                value={formData.name}
+                onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Preço (R$)
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  required
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Duração (min)
+                </label>
+                <input
+                  type="number"
+                  id="duration"
+                  name="duration"
+                  required
+                  value={formData.duration}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Duração (min)
-              </label>
-              <input
-                type="number"
-                required
-                value={formData.duration}
-                onChange={(e) => setFormData({...formData, duration: parseInt(e.target.value)})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Comissão (%)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                required
-                value={formData.commission}
-                onChange={(e) => setFormData({...formData, commission: parseInt(e.target.value)})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Categoria
               </label>
               <select
+                id="category"
+                name="category"
                 value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value as any})}
+                onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="haircut">Corte</option>
@@ -334,33 +311,35 @@ function ServiceModal({
                 <option value="other">Outros</option>
               </select>
             </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Descrição
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows={3}
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Descrição
-            </label>
-            <textarea
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div className="flex justify-end space-x-3 pt-4">
+
+          <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {service ? 'Atualizar' : 'Criar'} Serviço
+              {service ? 'Atualizar Serviço' : 'Salvar Serviço'}
             </button>
           </div>
         </form>
@@ -368,3 +347,19 @@ function ServiceModal({
     </div>
   );
 }
+
+<style>
+  @keyframes fade-in-scale {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  .animate-fade-in-scale {
+    animation: fade-in-scale 0.2s ease-out forwards;
+  }
+</style>
