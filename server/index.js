@@ -7,6 +7,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware básico
 app.use(express.json());
+
+// ATENÇÃO: Configuração de CORS aberta para fins de diagnóstico.
+// Isso permite requisições de QUALQUER origem.
+console.log('[DIAGNÓSTICO] Habilitando CORS para todas as origens.');
+app.use(cors());
+
+/* Configuração anterior:
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -16,6 +23,7 @@ app.use(cors({
   ],
   credentials: true
 }));
+*/
 
 // Rota de teste simples
 app.get('/api/test', (req, res) => {
@@ -53,11 +61,11 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// Rota raiz
+// Rota raiz para teste
 app.get('/', (req, res) => {
   console.log('[TESTE] Rota raiz foi chamada');
   res.json({ 
-    message: 'Servidor backend funcionando!', 
+    message: 'Servidor backend de teste funcionando!', 
     timestamp: new Date().toISOString(),
     status: 'success'
   });
