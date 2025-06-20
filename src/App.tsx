@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { useAuth } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy loading dos componentes para melhor performance
 const LoginForm = React.lazy(() => import('./components/Auth/LoginForm'));
@@ -33,15 +34,6 @@ function LoadingSpinner() {
   );
 }
 
-// Componente de erro
-function ErrorBoundary({ children }: { children: React.ReactNode }) {
-  return (
-    <React.Suspense fallback={<LoadingSpinner />}>
-      {children}
-    </React.Suspense>
-  );
-}
-
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
@@ -60,160 +52,45 @@ function AppRoutes() {
       <Route 
         path="/login" 
         element={
-          <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
             {user ? <Navigate to="/dashboard" /> : <LoginForm />}
-          </ErrorBoundary>
+          </Suspense>
         } 
       />
       <Route 
         path="/register" 
         element={
-          <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner />}>
             <RegisterPage />
-          </ErrorBoundary>
+          </Suspense>
         } 
       />
       <Route path="/" element={<Navigate to="/dashboard" />} />
+      
       <Route
-        path="/dashboard"
+        path="/*"
         element={
           <ProtectedRoute>
             <ErrorBoundary>
-            <Layout>
-              <Dashboard />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/pos"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <POS />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/cash-register"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <CashRegisterPage />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Products />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/services"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Services />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/barbers"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Barbers />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/customers"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Customers />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/sales"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Sales />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/commissions"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Commissions />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/appointments"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Appointments />
-            </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/reports"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-              <Layout>
-                <Reports />
-              </Layout>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute>
-            <ErrorBoundary>
-            <Layout>
-              <Settings />
-            </Layout>
+              <Suspense fallback={<LoadingSpinner />}>
+                <Layout>
+                  <Routes>
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="pos" element={<POS />} />
+                    <Route path="cash-register" element={<CashRegisterPage />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="services" element={<Services />} />
+                    <Route path="barbers" element={<Barbers />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="sales" element={<Sales />} />
+                    <Route path="commissions" element={<Commissions />} />
+                    <Route path="appointments" element={<Appointments />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
+                  </Routes>
+                </Layout>
+              </Suspense>
             </ErrorBoundary>
           </ProtectedRoute>
         }
