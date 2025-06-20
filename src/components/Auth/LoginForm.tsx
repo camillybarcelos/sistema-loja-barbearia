@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff, Loader2, Scissors } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 interface LoginFormData {
   email: string;
@@ -168,9 +169,9 @@ export default function LoginForm() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Não tem uma conta?{' '}
-              <a href="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
                 Cadastre-se
-              </a>
+              </Link>
             </p>
           </div>
         </div>

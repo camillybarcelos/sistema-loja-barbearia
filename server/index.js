@@ -119,6 +119,50 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Rota de Cadastro de Usuário
+app.post('/api/register', async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // 1. Validar inputs
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
+    // 2. Verificar se o usuário já existe
+    const existingUser = await Models.User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ error: 'Este email já está cadastrado.' });
+    }
+
+    // 3. Criptografar a senha
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 4. Criar o novo usuário (com role 'user' por padrão)
+    const newUser = await Models.User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'user', // Por padrão, novos usuários são 'user'
+      status: 'active'
+    });
+
+    console.log(`[LOG] Novo usuário cadastrado: ${newUser.email}`);
+
+    // 5. Retornar sucesso (sem retornar a senha)
+    res.status(201).json({
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    });
+
+  } catch (error) {
+    console.error('Erro no cadastro:', error);
+    res.status(500).json({ error: 'Erro interno do servidor ao tentar cadastrar.' });
+  }
+});
+
 // Rotas de Produtos
 app.get('/api/products', authenticateToken, async (req, res) => {
   try {

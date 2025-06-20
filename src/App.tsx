@@ -19,6 +19,7 @@ const Commissions = React.lazy(() => import('./pages/Commissions'));
 const Appointments = React.lazy(() => import('./pages/Appointments'));
 const Reports = React.lazy(() => import('./pages/Reports'));
 const Settings = React.lazy(() => import('./pages/Settings'));
+const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
 
 // Componente de loading
 function LoadingSpinner() {
@@ -61,6 +62,14 @@ function AppRoutes() {
         element={
           <ErrorBoundary>
             {user ? <Navigate to="/dashboard" /> : <LoginForm />}
+          </ErrorBoundary>
+        } 
+      />
+      <Route 
+        path="/register" 
+        element={
+          <ErrorBoundary>
+            <RegisterPage />
           </ErrorBoundary>
         } 
       />
