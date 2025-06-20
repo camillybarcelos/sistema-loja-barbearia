@@ -75,7 +75,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome Completo</label>
                 <div className="mt-1 relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input {...register('name', { required: 'Nome é obrigatório' })} className="pl-10 w-full rounded-lg" />
+                  <input {...register('name', { required: 'Nome é obrigatório' })} className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Seu nome completo" />
                 </div>
                 {errors.name && <p className="text-red-500 text-xs mt-1">{String(errors.name.message)}</p>}
               </div>
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                 <div className="mt-1 relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input {...register('email', { required: 'Email é obrigatório', pattern: { value: /^\S+@\S+$/i, message: "Email inválido" } })} type="email" className="pl-10 w-full rounded-lg" />
+                  <input {...register('email', { required: 'Email é obrigatório', pattern: { value: /^\S+@\S+$/i, message: "Email inválido" } })} type="email" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="seu@email.com" />
                 </div>
                 {errors.email && <p className="text-red-500 text-xs mt-1">{String(errors.email.message)}</p>}
               </div>
@@ -95,7 +95,7 @@ export default function RegisterPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
                 <div className="mt-1 relative">
                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input {...register('password', { required: 'Senha é obrigatória', minLength: { value: 6, message: 'Senha precisa ter no mínimo 6 caracteres' } })} type="password" className="pl-10 w-full rounded-lg" />
+                  <input {...register('password', { required: 'Senha é obrigatória', minLength: { value: 6, message: 'Senha precisa ter no mínimo 6 caracteres' } })} type="password" className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="••••••••" />
                 </div>
                 {errors.password && <p className="text-red-500 text-xs mt-1">{String(errors.password.message)}</p>}
               </div>
