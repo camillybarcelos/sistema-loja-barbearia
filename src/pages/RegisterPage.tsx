@@ -6,6 +6,10 @@ import { User, Mail, Lock, Loader2, Scissors, ArrowLeft } from 'lucide-react';
 // URL da API do backend
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+// Debug: Log da URL da API
+console.log('[DEBUG] VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('[DEBUG] API_URL final:', API_URL);
+
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -19,6 +23,10 @@ export default function RegisterPage() {
     setServerError(null);
     setSuccessMessage(null);
 
+    // Debug: Log da requisição
+    console.log('[DEBUG] Fazendo requisição para:', `${API_URL}/api/register`);
+    console.log('[DEBUG] Dados enviados:', data);
+
     try {
       const response = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
@@ -26,7 +34,11 @@ export default function RegisterPage() {
         body: JSON.stringify(data),
       });
 
+      console.log('[DEBUG] Status da resposta:', response.status);
+      console.log('[DEBUG] Headers da resposta:', response.headers);
+
       const responseData = await response.json();
+      console.log('[DEBUG] Dados da resposta:', responseData);
 
       if (!response.ok) {
         throw new Error(responseData.error || 'Ocorreu um erro no cadastro.');
@@ -40,6 +52,7 @@ export default function RegisterPage() {
       }, 3000);
 
     } catch (error: any) {
+      console.error('[DEBUG] Erro na requisição:', error);
       setServerError(error.message);
     } finally {
       setIsLoading(false);
