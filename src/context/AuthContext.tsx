@@ -27,7 +27,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
