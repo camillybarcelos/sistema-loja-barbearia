@@ -105,3 +105,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
+
+// Forçando a atualização do arquivo para o Git
