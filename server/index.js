@@ -28,10 +28,14 @@ async function startServer() {
   try {
     // Conectar ao MongoDB
     await connectToDatabase();
+    console.log('[LOG] Conexão com o MongoDB estabelecida com sucesso.');
     
     // Criar usuário admin padrão se não existir
     const adminExists = await Models.User.findOne({ email: 'admin@admin.com' });
+    console.log(`[LOG] Verificando se admin existe: ${adminExists ? 'Sim' : 'Não'}`);
+
     if (!adminExists) {
+      console.log('[LOG] Admin não encontrado, criando novo usuário admin...');
       const hashedPassword = await bcrypt.hash('admin', 10);
       await Models.User.create({
         name: 'Administrador',
@@ -74,16 +78,23 @@ function authenticateToken(req, res, next) {
 
 // Rotas
 app.post('/api/login', async (req, res) => {
+  console.log('[LOG] Rota /api/login chamada.');
   try {
     const { email, password } = req.body;
-    const user = await Models.User.findOne({ email });
+    console.log(`[LOG] Tentativa de login para o email: ${email}`);
 
+    const user = await Models.User.findOne({ email });
     if (!user) {
+      console.log('[LOG] Usuário não encontrado no banco de dados.');
       return res.status(401).json({ error: 'Usuário não encontrado' });
     }
+    console.log('[LOG] Usuário encontrado no banco de dados.');
 
     const validPassword = await bcrypt.compare(password, user.password);
+    console.log(`[LOG] Comparação de senha válida: ${validPassword}`);
+
     if (!validPassword) {
+      console.log('[LOG] Senha inválida.');
       return res.status(401).json({ error: 'Senha inválida' });
     }
 
