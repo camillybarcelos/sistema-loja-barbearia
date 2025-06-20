@@ -1,0 +1,154 @@
+import express from 'express';
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { connectToDatabase } from './database/connection.js';
+import * as Models from './database/models.js';
+
+// Carregar variáveis de ambiente do arquivo .env.local
+dotenv.config({ path: '.env.local' });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'sua-chave-secreta-aqui';
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Iniciar servidor
+async function startServer() {
+  try {
+    // Conectar ao MongoDB
+    await connectToDatabase();
+    
+    // Criar usuário admin padrão se não existir
+    const adminExists = await Models.User.findOne({ email: 'admin@admin.com' });
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash('admin', 10);
+      await Models.User.create({
+        name: 'Administrador',
+        email: 'admin@admin.com',
+        password: hashedPassword,
+        role: 'admin',
+        status: 'active'
+      });
+      console.log('Usuário admin criado com sucesso!');
+    }
+
+    // Iniciar o servidor Express
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+      console.log(`Acesse: http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Erro ao iniciar o servidor:', error);
+    process.exit(1);
+  }
+}
+
+// Middleware de autenticação
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token inválido' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Rotas
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await Models.User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Usuário não encontrado' });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Senha inválida' });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Rotas de Produtos
+app.get('/api/products', authenticateToken, async (req, res) => {
+  try {
+    const products = await Models.Product.find();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar produtos' });
+  }
+});
+
+app.post('/api/products', authenticateToken, async (req, res) => {
+  try {
+    const newProduct = new Models.Product(req.body);
+    await newProduct.save();
+    res.status(201).json(newProduct);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar produto' });
+  }
+});
+
+app.put('/api/products/:id', authenticateToken, async (req, res) => {
+  try {
+    const updatedProduct = await Models.Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar produto' });
+  }
+});
+
+app.delete('/api/products/:id', authenticateToken, async (req, res) => {
+  try {
+    await Models.Product.findByIdAndDelete(req.params.id);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao deletar produto' });
+  }
+});
+
+// Iniciar o servidor
+startServer(); 
