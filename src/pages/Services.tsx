@@ -6,8 +6,7 @@ import {
   Edit, 
   Trash2, 
   Clock,
-  DollarSign,
-  Percent
+  DollarSign
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Service } from '../types';
@@ -19,7 +18,6 @@ export default function Services() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
 
-  // Filter services
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || service.category === selectedCategory;
@@ -40,7 +38,6 @@ export default function Services() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -59,8 +56,7 @@ export default function Services() {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center">
             <Scissors className="h-8 w-8 text-purple-600 dark:text-purple-400" />
@@ -94,7 +90,6 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
@@ -123,7 +118,6 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredServices.map((service) => (
           <div key={service.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
@@ -188,7 +182,6 @@ export default function Services() {
         ))}
       </div>
 
-      {/* Add/Edit Service Modal */}
       {(showAddModal || editingService) && (
         <ServiceModal
           service={editingService}
@@ -203,7 +196,6 @@ export default function Services() {
   );
 }
 
-// Service Modal Component
 function ServiceModal({ 
   service, 
   onSave, 
@@ -234,9 +226,9 @@ function ServiceModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>
       <div 
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-0 w-full max-w-md transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-0 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -347,19 +339,3 @@ function ServiceModal({
     </div>
   );
 }
-
-<style>
-  @keyframes fade-in-scale {
-    from {
-      transform: scale(0.95);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-  .animate-fade-in-scale {
-    animation: fade-in-scale 0.2s ease-out forwards;
-  }
-</style>
