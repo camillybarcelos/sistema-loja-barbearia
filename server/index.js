@@ -43,34 +43,37 @@ app.use(express.static(path.join(__dirname, '../dist')));
 // Iniciar servidor
 async function startServer() {
   try {
-    // Conectar ao MongoDB
-    await connectToDatabase();
-    console.log('[LOG] Conexão com o MongoDB estabelecida com sucesso.');
-    
-    // Criar usuário admin padrão se não existir
-    const adminExists = await Models.User.findOne({ email: 'admin@admin.com' });
-    console.log(`[LOG] Verificando se admin existe: ${adminExists ? 'Sim' : 'Não'}`);
+    console.log('[DIAGNÓSTICO] Tentando iniciar o servidor...');
 
-    if (!adminExists) {
-      console.log('[LOG] Admin não encontrado, criando novo usuário admin...');
-      const hashedPassword = await bcrypt.hash('admin', 10);
-      await Models.User.create({
-        name: 'Administrador',
-        email: 'admin@admin.com',
-        password: hashedPassword,
-        role: 'admin',
-        status: 'active'
-      });
-      console.log('Usuário admin criado com sucesso!');
-    }
+    // Conectar ao MongoDB (Temporariamente desativado para teste)
+    // await connectToDatabase();
+    // console.log('[LOG] Conexão com o MongoDB estabelecida com sucesso.'); 
+    
+    // Criar usuário admin padrão se não existir (Temporariamente desativado para teste)
+    // const adminExists = await Models.User.findOne({ email: 'admin@admin.com' });
+    // console.log(`[LOG] Verificando se admin existe: ${adminExists ? 'Sim' : 'Não'}`); 
+
+    // if (!adminExists) {
+    //   console.log('[LOG] Admin não encontrado, criando novo usuário admin...'); 
+    //   const hashedPassword = await bcrypt.hash('admin', 10);
+    //   await Models.User.create({
+    //     name: 'Administrador',
+    //     email: 'admin@admin.com',
+    //     password: hashedPassword,
+    //     role: 'admin',
+    //     status: 'active'
+    //   });
+    //   console.log('Usuário admin criado com sucesso!');
+    // }
 
     // Iniciar o servidor Express
     app.listen(PORT, () => {
-      console.log(`Servidor rodando na porta ${PORT}`);
+      console.log(`[DIAGNÓSTICO] Servidor iniciado e ouvindo na porta ${PORT}.`);
+      console.log(`[DIAGNÓSTICO] O servidor está online e pronto para receber requisições.`);
       console.log(`Acesse: http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Erro ao iniciar o servidor:', error);
+    console.error('[DIAGNÓSTICO] Erro CRÍTICO ao iniciar o servidor:', error);
     process.exit(1);
   }
 }
